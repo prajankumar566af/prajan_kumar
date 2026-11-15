@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 const client = axios.create({
@@ -16,12 +17,26 @@ export const api = {
   sendContact: (payload) => client.post("/contact/", payload).then((r) => r.data),
 };
 
-/** Turns an Axios error into { message, fieldErrors } for UI states. */
 export function parseError(err) {
-  if (err.response?.status === 429) return { message: "Too many messages. Please try again later.", fieldErrors: {} };
+  if (err.response?.status === 429) {
+    return {
+      message: "Too many messages. Please try again later.",
+      fieldErrors: {},
+    };
+  }
+
   if (err.response?.status === 400) {
     const d = err.response.data || {};
-    return { message: d.non_field_errors?.[0] || "Please fix the highlighted fields.", fieldErrors: d };
+    return {
+      message: d.non_field_errors?.[0] || "Please fix the highlighted fields.",
+      fieldErrors: d,
+    };
   }
-  return { message: err.code === "ERR_NETWORK" ? "Cannot reach the server." : "Something went wrong.", fieldErrors: {} };
+
+  return {
+    message: err.code === "ERR_NETWORK"
+      ? "Cannot reach the server."
+      : "Something went wrong.",
+    fieldErrors: {},
+  };
 }
